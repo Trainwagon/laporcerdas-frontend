@@ -1,8 +1,15 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
+import CrosscheckLaporan from './pages/CrosscheckLaporan'
 
 function App() {
   return (
-    <Dashboard />
+    <Router>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/crosscheck" element={<CrosscheckLaporan />} />
+      </Routes>
+    </Router>
   )
 }
 

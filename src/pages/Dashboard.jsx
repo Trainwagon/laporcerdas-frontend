@@ -11,8 +11,10 @@ import {
   User,
   ChevronDown
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const stats = [
     { title: 'Total Laporan Masuk', value: 50, icon: Inbox, iconClass: 'text-gray-800' },
     { title: 'Laporan diproses', value: 25, icon: RefreshCw, iconClass: 'text-gray-800' },
@@ -73,15 +75,15 @@ const Dashboard = () => {
         </div>
 
         <nav className="flex-1 px-4 space-y-2 mt-4">
-          <a href="#" className="block px-4 py-3 bg-yellow-400 text-white font-medium rounded-md">
+          <div className="block px-4 py-3 bg-yellow-400 text-white font-medium rounded-md cursor-pointer">
             Dashboard
-          </a>
-          <a href="#" className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md">
+          </div>
+          <div onClick={() => navigate('/crosscheck')} className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md cursor-pointer">
             Crosscheck Laporan
-          </a>
-          <a href="#" className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md">
+          </div>
+          <div className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md cursor-pointer">
             Rekapitulasi Laporan
-          </a>
+          </div>
         </nav>
 
         <div className="p-4 border-t border-gray-200">

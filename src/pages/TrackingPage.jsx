@@ -8,14 +8,30 @@ const TrackingPage = () => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchId.trim()) {
-      // Simulate fetching data
+      // Simulate fetching data based on ID for demonstration
+      // ID "1" -> Status 1 (Dikirimkan)
+      // ID "2" -> Status 2 (Ditinjau)
+      // ID "3" -> Status 3 (Tim Lapangan)
+      // ID "4" -> Status 4 (Selesai)
+      // ID "5" -> Status Rejected (Ditolak)
+      
+      let mockStatus = 1;
+      let isRejected = false;
+      
+      if (searchId === '2') mockStatus = 2;
+      else if (searchId === '3') mockStatus = 3;
+      else if (searchId === '4') mockStatus = 4;
+      else if (searchId === '5') { mockStatus = 2; isRejected = true; } // Rejected usually happens at review stage
+
       setReportData({
-        id: searchId,
-        status: 1, // 1: Dikirimkan, 2: Diproses, 3: Selesai
+        id: `IDLapor#${Math.floor(Math.random() * 1000000)}`,
+        status: mockStatus, 
+        isRejected: isRejected,
         date: '11 November 2025',
         deadline: '14 November 2025',
         category: 'Infrastruktur',
         description: 'Adanya lobang besar di dekat jalan raya yang membahayakan pengendara motor.',
+        rejectionReason: 'Laporan tidak valid karena lokasi tidak berada di wilayah Roa Malaka.',
         location: 'Jl. Tiang Bendera V',
         coordinates: '-6.123456, 106.123456'
       });
@@ -90,28 +106,54 @@ const TrackingPage = () => {
 
               {/* Stepper */}
               <div className="max-w-3xl mx-auto mb-16 relative">
-                <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -translate-y-1/2 z-0"></div>
-                <div className="relative z-10 flex justify-between">
-                  {/* Step 1 */}
-                  <div className="flex flex-col items-center gap-2">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg border-4 ${reportData.status >= 1 ? 'bg-white border-yellow-400 text-gray-900' : 'bg-gray-200 border-gray-200 text-gray-400'}`}>
+                {/* Connecting Line */}
+                <div className="absolute top-1/2 left-0 w-full h-2 bg-gray-200 -translate-y-1/2 z-0 rounded-full"></div>
+                
+                {/* Colored Line Overlay */}
+                <div 
+                  className={`absolute top-1/2 left-0 h-2 -translate-y-1/2 z-0 rounded-full transition-all duration-500 ${reportData.isRejected ? 'bg-red-500' : 'bg-yellow-400'}`}
+                  style={{ width: reportData.isRejected ? '33%' : `${((reportData.status - 1) / 3) * 100}%` }}
+                ></div>
+
+                <div className="relative z-10 flex justify-between w-full">
+                  {/* Step 1: Dikirimkan */}
+                  <div className="flex flex-col items-center gap-2 w-24">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 bg-white z-10
+                      ${reportData.status >= 1 ? (reportData.isRejected ? 'border-yellow-400 text-gray-900' : 'border-yellow-400 text-gray-900') : 'border-gray-200 text-gray-400'}`}>
                       1
                     </div>
-                    <p className="text-xs font-bold text-center w-24">Laporan Dikirimkan</p>
+                    <p className="text-sm font-bold text-center leading-tight">Laporan Dikirimkan</p>
                   </div>
-                  {/* Step 2 */}
-                  <div className="flex flex-col items-center gap-2">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg border-4 ${reportData.status >= 2 ? 'bg-white border-yellow-400 text-gray-900' : 'bg-gray-200 border-gray-200 text-gray-400'}`}>
+
+                  {/* Step 2: Ditinjau / Ditolak */}
+                  <div className="flex flex-col items-center gap-2 w-24">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 bg-white z-10
+                      ${reportData.isRejected 
+                        ? 'border-red-500 text-gray-900' 
+                        : (reportData.status >= 2 ? 'border-yellow-400 text-gray-900' : 'border-gray-200 text-gray-400')}`}>
                       2
                     </div>
-                    <p className="text-xs font-bold text-center w-24 text-gray-400">Laporan Diproses</p>
+                    <p className="text-sm font-bold text-center leading-tight">
+                      {reportData.isRejected ? 'Ditolak' : 'Laporan Sedang Ditinjau'}
+                    </p>
                   </div>
-                  {/* Step 3 */}
-                  <div className="flex flex-col items-center gap-2">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg border-4 ${reportData.status >= 3 ? 'bg-white border-yellow-400 text-gray-900' : 'bg-gray-200 border-gray-200 text-gray-400'}`}>
+
+                  {/* Step 3: Tim Lapangan */}
+                  <div className="flex flex-col items-center gap-2 w-24">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 bg-white z-10
+                      ${reportData.status >= 3 && !reportData.isRejected ? 'border-yellow-400 text-gray-900' : 'border-gray-200 text-gray-400'}`}>
                       3
                     </div>
-                    <p className="text-xs font-bold text-center w-24 text-gray-400">Laporan Selesai</p>
+                    <p className="text-sm font-bold text-center leading-tight text-gray-500">Tim Lapangan Ditugaskan</p>
+                  </div>
+
+                  {/* Step 4: Selesai */}
+                  <div className="flex flex-col items-center gap-2 w-24">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 bg-white z-10
+                      ${reportData.status >= 4 && !reportData.isRejected ? 'border-yellow-400 text-gray-900' : 'border-gray-200 text-gray-400'}`}>
+                      4
+                    </div>
+                    <p className="text-sm font-bold text-center leading-tight text-gray-500">Selesai</p>
                   </div>
                 </div>
               </div>
@@ -119,58 +161,90 @@ const TrackingPage = () => {
               <hr className="border-gray-200 mb-8" />
 
               {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-12">
-                <div>
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-2 h-2 rounded-full bg-gray-900"></div>
-                    <h3 className="text-lg font-bold text-gray-900">Informasi laporan</h3>
-                  </div>
-                  
-                  <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-12 text-left">
+                {reportData.isRejected ? (
+                  // Rejected Layout
+                  <>
                     <div>
-                      <p className="text-sm font-bold text-gray-900 mb-2">tanggal laporan masuk</p>
-                      <div className="h-2 w-3/4 bg-slate-500 rounded-full"></div>
-                      <p className="text-xs text-gray-500 mt-1">{reportData.date}</p>
+                      <div className="flex items-center gap-2 mb-6">
+                        <div className="w-3 h-3 rounded-full bg-black"></div>
+                        <h3 className="text-lg font-bold text-gray-900">Isi laporan</h3>
+                      </div>
+                      <div className="bg-slate-200 rounded-lg px-4 py-3 w-full">
+                        <p className="text-sm text-gray-700 font-medium leading-relaxed">{reportData.description}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 mb-2">batas waktu penyelesaian</p>
-                      <div className="h-2 w-3/4 bg-slate-500 rounded-full"></div>
-                      <p className="text-xs text-gray-500 mt-1">{reportData.deadline}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 mb-2">kategori</p>
-                      <div className="h-2 w-3/4 bg-slate-500 rounded-full"></div>
-                      <p className="text-xs text-gray-500 mt-1">{reportData.category}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 mb-2">isi laporan</p>
-                      <div className="h-2 w-3/4 bg-slate-500 rounded-full"></div>
-                      <div className="h-2 w-1/2 bg-slate-500 rounded-full mt-2"></div>
-                      <div className="h-2 w-2/3 bg-slate-500 rounded-full mt-2"></div>
-                      <p className="text-xs text-gray-500 mt-2">{reportData.description}</p>
-                    </div>
-                  </div>
-                </div>
 
-                <div>
-                  <div className="flex items-center gap-2 mb-6">
-                    <div className="w-2 h-2 rounded-full bg-gray-900"></div>
-                    <h3 className="text-lg font-bold text-gray-900">Lokasi kejadian</h3>
-                  </div>
+                    <div>
+                      <div className="flex items-center gap-2 mb-6">
+                        <div className="w-3 h-3 rounded-full bg-black"></div>
+                        <h3 className="text-lg font-bold text-gray-900">Alasan penolakan</h3>
+                      </div>
+                      <div className="bg-red-50 rounded-lg px-4 py-3 w-full border border-red-100">
+                        <p className="text-sm text-red-600 font-medium leading-relaxed">{reportData.rejectionReason}</p>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  // Normal Layout
+                  <>
+                    <div>
+                      <div className="flex items-center gap-2 mb-6">
+                        <div className="w-3 h-3 rounded-full bg-black"></div>
+                        <h3 className="text-lg font-bold text-gray-900">Informasi laporan</h3>
+                      </div>
+                      
+                      <div className="space-y-6">
+                        <div>
+                          <p className="text-base font-bold text-gray-900 mb-2">tanggal laporan masuk</p>
+                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-fit">
+                            <p className="text-sm text-gray-700 font-medium">{reportData.date}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-base font-bold text-gray-900 mb-2">batas waktu penyelesaian</p>
+                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-fit">
+                            <p className="text-sm text-gray-700 font-medium">{reportData.deadline}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-base font-bold text-gray-900 mb-2">kategori</p>
+                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-fit">
+                            <p className="text-sm text-gray-700 font-medium">{reportData.category}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-base font-bold text-gray-900 mb-2">isi laporan</p>
+                          <div className="bg-slate-200 rounded-lg px-4 py-3 w-full">
+                            <p className="text-sm text-gray-700 font-medium leading-relaxed">{reportData.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="space-y-6">
                     <div>
-                      <p className="text-sm font-bold text-gray-900 mb-2">lokasi masalah</p>
-                      <div className="h-2 w-3/4 bg-slate-500 rounded-full"></div>
-                      <p className="text-xs text-gray-500 mt-1">{reportData.location}</p>
+                      <div className="flex items-center gap-2 mb-6">
+                        <div className="w-3 h-3 rounded-full bg-black"></div>
+                        <h3 className="text-lg font-bold text-gray-900">Lokasi kejadian</h3>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div>
+                          <p className="text-base font-bold text-gray-900 mb-2">lokasi masalah</p>
+                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-full">
+                            <p className="text-sm text-gray-700 font-medium">{reportData.location}</p>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-base font-bold text-gray-900 mb-2">koordinat</p>
+                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-full">
+                            <p className="text-sm text-gray-700 font-medium">{reportData.coordinates}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-900 mb-2">koordinat</p>
-                      <div className="h-2 w-3/4 bg-slate-500 rounded-full"></div>
-                      <p className="text-xs text-gray-500 mt-1">{reportData.coordinates}</p>
-                    </div>
-                  </div>
-                </div>
+                  </>
+                )}
               </div>
             </div>
           )}

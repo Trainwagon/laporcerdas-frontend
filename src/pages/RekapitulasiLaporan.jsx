@@ -7,17 +7,18 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Search,
+  ChevronDown
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const CrosscheckLaporan = () => {
+const RekapitulasiLaporan = () => {
   const navigate = useNavigate();
   const [selectedReport, setSelectedReport] = useState(null);
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [showMoveModal, setShowMoveModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
 
-  // Dummy data based on the image
+  // Dummy data
   const reports = [
     {
       id: 'IDLapor#272641',
@@ -25,13 +26,14 @@ const CrosscheckLaporan = () => {
       location: 'Jl. Ismail',
       date: '11 November 2025',
       category: 'Infrastruktur',
-      status: 'menunggu',
+      status: 'Selesai',
       details: {
         name: 'ismail yunus',
         phone: '08962351191',
-        email: '08962351191', // Image shows email as phone number? keeping as is
+        email: '08962351191',
         address: 'Jl. Kanut Halim',
-        category: 'Infrastruktur'
+        category: 'Infrastruktur',
+        completionNote: 'masalah lobang besar sudah diatasi dengan pengecoran pada lubang'
       }
     },
     {
@@ -40,13 +42,14 @@ const CrosscheckLaporan = () => {
       location: 'Jl. Khairul anwar',
       date: '11 November 2025',
       category: 'Infrastruktur',
-      status: 'menunggu',
+      status: 'Tolak',
       details: {
         name: 'Ahmad',
         phone: '08123456789',
         email: 'ahmad@example.com',
         address: 'Jl. Khairul anwar No. 10',
-        category: 'Infrastruktur'
+        category: 'Infrastruktur',
+        rejectionReason: 'kurangnya bukti yang kuat minimnya informasi'
       }
     },
     {
@@ -55,13 +58,12 @@ const CrosscheckLaporan = () => {
       location: 'Jl. Jendral samirudin',
       date: '11 November 2025',
       category: 'Infrastruktur',
-      status: 'menunggu',
+      status: 'Selesai',
       details: {
         name: 'Fulan',
         phone: '08129876543',
         email: 'fulan@example.com',
-        address: 'Jl. Jendral samirudin No. 5',
-        category: 'Infrastruktur'
+        address: 'Jl. Jendral samirudin No. 5'
       }
     },
     {
@@ -70,13 +72,12 @@ const CrosscheckLaporan = () => {
       location: 'Jl. Kasah tiga',
       date: '11 November 2025',
       category: 'Infrastruktur',
-      status: 'menunggu',
+      status: 'Tolak',
       details: {
         name: 'Budi',
         phone: '081211223344',
         email: 'budi@example.com',
-        address: 'Jl. Kasah tiga No. 8',
-        category: 'Infrastruktur'
+        address: 'Jl. Kasah tiga No. 8'
       }
     },
     {
@@ -85,16 +86,39 @@ const CrosscheckLaporan = () => {
       location: 'Jl. Este dua bell',
       date: '11 November 2025',
       category: 'Infrastruktur',
-      status: 'menunggu',
+      status: 'Selesai',
       details: {
         name: 'Siti',
         phone: '081255667788',
         email: 'siti@example.com',
-        address: 'Jl. Este dua bell No. 2',
+        address: 'Jl. Este dua bell No. 2'
+      }
+    },
+    {
+      id: 'IDLapor#288342',
+      description: 'banyaknya sampah di buang sembarangan',
+      location: 'Jl. Kasah tiga',
+      date: '11 November 2025',
+      category: 'Infrastruktur',
+      status: 'Proses',
+      details: {
+        name: 'Budi',
+        phone: '081211223344',
+        email: 'budi@example.com',
+        address: 'Jl. Kasah tiga No. 8',
         category: 'Infrastruktur'
       }
     },
   ];
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Selesai': return 'bg-green-500 text-white';
+      case 'Tolak': return 'bg-red-600 text-white';
+      case 'Proses': return 'bg-yellow-400 text-white';
+      default: return 'bg-gray-200 text-gray-700';
+    }
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-100 font-sans">
@@ -114,10 +138,10 @@ const CrosscheckLaporan = () => {
           <div onClick={() => navigate('/')} className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md cursor-pointer">
             Dashboard
           </div>
-          <div className="block px-4 py-3 bg-yellow-400 text-white font-medium rounded-md cursor-pointer">
+          <div onClick={() => navigate('/crosscheck')} className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md cursor-pointer">
             Crosscheck Laporan
           </div>
-          <div onClick={() => navigate('/rekapitulasi')} className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md cursor-pointer">
+          <div className="block px-4 py-3 bg-yellow-400 text-white font-medium rounded-md cursor-pointer">
             Rekapitulasi Laporan
           </div>
         </nav>
@@ -153,8 +177,31 @@ const CrosscheckLaporan = () => {
 
         <div className="p-8">
           {/* Table Section */}
+          {!selectedReport && (
           <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Data Laporan</h3>
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex gap-2">
+                <h3 className="text-lg font-bold text-gray-900 mr-4">Data Laporan</h3>
+                <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 flex items-center gap-1">
+                  Status <ChevronDown size={14} />
+                </button>
+                <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 flex items-center gap-1">
+                  Tanggal <ChevronDown size={14} />
+                </button>
+                <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 flex items-center gap-1">
+                  Kategori <ChevronDown size={14} />
+                </button>
+              </div>
+              <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="Cari" 
+                  className="pl-8 pr-4 py-1 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+                <Search size={14} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              </div>
+            </div>
+
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-gray-50 text-gray-900 font-semibold">
@@ -164,7 +211,7 @@ const CrosscheckLaporan = () => {
                     <th className="px-4 py-3">Lokasi</th>
                     <th className="px-4 py-3">Tanggal</th>
                     <th className="px-4 py-3">Kategori</th>
-                    <th className="px-4 py-3 rounded-r-lg">status</th>
+                    <th className="px-4 py-3 rounded-r-lg text-center">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -179,7 +226,11 @@ const CrosscheckLaporan = () => {
                       <td className="px-4 py-4 text-gray-600">{report.location}</td>
                       <td className="px-4 py-4 text-gray-600">{report.date}</td>
                       <td className="px-4 py-4 text-gray-600">{report.category}</td>
-                      <td className="px-4 py-4 text-gray-600">{report.status}</td>
+                      <td className="px-4 py-4 text-center">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(report.status)}`}>
+                          {report.status}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -193,6 +244,7 @@ const CrosscheckLaporan = () => {
               <button className="p-1 text-gray-400 hover:text-gray-600"><ChevronRight size={16} /></button>
             </div>
           </div>
+          )}
 
           {/* Detail Section */}
           {selectedReport && (
@@ -262,51 +314,97 @@ const CrosscheckLaporan = () => {
 
                   <div className="mb-6">
                     <h4 className="text-lg font-bold text-gray-900 mb-1">Kategori</h4>
-                    <p className="text-gray-600">{selectedReport.details.category}</p>
+                    <p className="text-gray-600">{selectedReport.category}</p>
+                  </div>
+
+                  <div className="mb-6">
+                    <h4 className="text-lg font-bold text-gray-900 mb-1">Status</h4>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(selectedReport.status)}`}>
+                      {selectedReport.status}
+                    </span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-center gap-4 mt-8">
-                <button className="px-8 py-2 bg-green-600 text-white font-medium rounded hover:bg-green-700">
-                  Terima
-                </button>
-                <button 
-                  onClick={() => setShowRejectModal(true)}
-                  className="px-8 py-2 bg-red-600 text-white font-medium rounded hover:bg-red-700"
-                >
-                  Tolak
-                </button>
-                <button 
-                  onClick={() => setShowMoveModal(true)}
-                  className="px-8 py-2 bg-blue-700 text-white font-medium rounded hover:bg-blue-800"
-                >
-                  pindah seksi
-                </button>
-              </div>
+              {/* Conditional Content based on Status */}
+              {selectedReport.status === 'Tolak' && (
+                <div className="mt-6">
+                  <h4 className="text-lg font-bold text-gray-900 mb-1">Keterangan Penolakan</h4>
+                  <p className="text-gray-600 mb-8">{selectedReport.details.rejectionReason}</p>
+                  
+                  <div className="flex justify-center gap-4">
+                    <button className="px-8 py-2 bg-green-600 text-white font-medium rounded hover:bg-green-700">
+                      Ubah status
+                    </button>
+                    <button className="px-8 py-2 bg-red-600 text-white font-medium rounded hover:bg-red-700">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedReport.status === 'Selesai' && (
+                <div className="mt-6">
+                  <h4 className="text-lg font-bold text-gray-900 mb-1">Bukti Laporan diselesaikan</h4>
+                  <p className="text-gray-600 mb-4">{selectedReport.details.completionNote}</p>
+                  <div className="flex gap-4 mb-8">
+                    <div className="w-32 h-24 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+                      <ImageIcon size={24} />
+                    </div>
+                    <div className="w-32 h-24 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
+                      <ImageIcon size={24} />
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-center">
+                    <button className="px-8 py-2 bg-green-600 text-white font-medium rounded hover:bg-green-700">
+                      Donwload file
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedReport.status === 'Proses' && (
+                <div className="mt-8 flex justify-center">
+                  <button 
+                    onClick={() => setShowCompleteModal(true)}
+                    className="px-8 py-2 bg-green-600 text-white font-medium rounded hover:bg-green-700"
+                  >
+                    Ubah selesai
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
       </main>
 
-      {/* Reject Modal */}
-      {showRejectModal && (
+      {/* Complete Modal */}
+      {showCompleteModal && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
           <div className="bg-white rounded-xl p-6 w-[600px] relative">
             <button 
-              onClick={() => setShowRejectModal(false)}
+              onClick={() => setShowCompleteModal(false)}
               className="absolute top-4 right-4 p-1 bg-red-500 text-white rounded hover:bg-red-600"
             >
               <X size={20} />
             </button>
             
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Keterangan penolakan</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Bukti laporan diselesaikan</h3>
             
-            <div className="mb-6">
+            <div className="mb-4">
               <textarea 
-                className="w-full h-40 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Jelaskan alasan laporan ditolak..."
+                className="w-full h-32 p-4 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Jelaskan langkah penanganan yang telah dilakukan terhadap laporan, serta waktu dilakukannya"
               ></textarea>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-sm font-bold text-gray-900 mb-2">Lampirkan foto</p>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-gray-500 cursor-pointer hover:bg-gray-50">
+                <p className="text-xs font-bold text-gray-900">Klik untuk upload foto</p>
+                <p className="text-[10px]">Maksimal 5MB, format JPG/PNG</p>
+              </div>
             </div>
 
             <div className="flex justify-center">
@@ -317,46 +415,8 @@ const CrosscheckLaporan = () => {
           </div>
         </div>
       )}
-
-      {/* Move Section Modal */}
-      {showMoveModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl p-6 w-[500px] relative">
-            <button 
-              onClick={() => setShowMoveModal(false)}
-              className="absolute top-4 right-4 p-1 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              <X size={20} />
-            </button>
-            
-            <h3 className="text-lg font-bold text-gray-900 mb-6">Koreksi Kategori Laporan</h3>
-            
-            <div className="mb-8">
-              <p className="text-gray-700 mb-2 font-medium">Silakan pilih seksi yang tepat untuk laporan ini.</p>
-              <select className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option>Seksi</option>
-                <option>Infrastruktur</option>
-                <option>Kebersihan</option>
-                <option>Lingkungan</option>
-              </select>
-            </div>
-
-            <div className="flex justify-center gap-4">
-              <button className="px-8 py-2 bg-green-600 text-white font-medium rounded hover:bg-green-700">
-                Simpan
-              </button>
-              <button 
-                onClick={() => setShowMoveModal(false)}
-                className="px-8 py-2 bg-red-600 text-white font-medium rounded hover:bg-red-700"
-              >
-                Batal
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
-export default CrosscheckLaporan;
+export default RekapitulasiLaporan;

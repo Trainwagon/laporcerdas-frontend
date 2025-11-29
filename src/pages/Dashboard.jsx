@@ -81,7 +81,7 @@ const Dashboard = () => {
           <div onClick={() => navigate('/crosscheck')} className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md cursor-pointer">
             Crosscheck Laporan
           </div>
-          <div className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md cursor-pointer">
+          <div onClick={() => navigate('/rekapitulasi')} className="block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-md cursor-pointer">
             Rekapitulasi Laporan
           </div>
         </nav>

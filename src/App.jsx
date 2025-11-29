@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Dashboard from './pages/Dashboard'
 import CrosscheckLaporan from './pages/CrosscheckLaporan'
+import RekapitulasiLaporan from './pages/RekapitulasiLaporan'
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/crosscheck" element={<CrosscheckLaporan />} />
+        <Route path="/rekapitulasi" element={<RekapitulasiLaporan />} />
       </Routes>
     </Router>
   )

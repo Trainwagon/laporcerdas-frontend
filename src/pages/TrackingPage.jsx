@@ -107,11 +107,11 @@ const TrackingPage = () => {
               {/* Stepper */}
               <div className="max-w-3xl mx-auto mb-16 relative">
                 {/* Connecting Line */}
-                <div className="absolute top-1/2 left-0 w-full h-3 bg-gray-200 -translate-y-1/2 z-0 rounded-full"></div>
+                <div className="absolute top-7 left-0 w-full h-3 bg-gray-200 -translate-y-1/2 z-0 rounded-full"></div>
                 
                 {/* Colored Line Overlay */}
                 <div 
-                  className={`absolute top-1/2 left-0 h-3 -translate-y-1/2 z-0 rounded-full transition-all duration-500 ${reportData.isRejected ? 'bg-red-500' : 'bg-yellow-400'}`}
+                  className={`absolute top-7 left-0 h-3 -translate-y-1/2 z-0 rounded-full transition-all duration-500 ${reportData.isRejected ? 'bg-red-500' : 'bg-yellow-400'}`}
                   style={{ width: reportData.isRejected ? '33%' : `${((reportData.status - 1) / 3) * 100}%` }}
                 ></div>
 

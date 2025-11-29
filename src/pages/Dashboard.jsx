@@ -159,7 +159,15 @@ const Dashboard = () => {
                 <tbody className="divide-y divide-gray-100">
                   {reports.map((report, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-4 py-4 font-medium text-gray-900">{report.status}</td>
+                      <td className="px-4 py-4">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                          report.status === 'Menunggu' ? 'bg-gray-500 text-white' :
+                          report.status === 'Selesai' ? 'bg-green-500 text-white' :
+                          report.status === 'Tolak' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {report.status}
+                        </span>
+                      </td>
                       <td className="px-4 py-4 text-gray-600">{report.description}</td>
                       <td className="px-4 py-4 text-gray-600">{report.location}</td>
                       <td className="px-4 py-4 text-gray-600">{report.date}</td>

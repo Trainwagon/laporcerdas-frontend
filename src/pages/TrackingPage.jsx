@@ -107,18 +107,18 @@ const TrackingPage = () => {
               {/* Stepper */}
               <div className="max-w-3xl mx-auto mb-16 relative">
                 {/* Connecting Line */}
-                <div className="absolute top-1/2 left-0 w-full h-2 bg-gray-200 -translate-y-1/2 z-0 rounded-full"></div>
+                <div className="absolute top-1/2 left-0 w-full h-3 bg-gray-200 -translate-y-1/2 z-0 rounded-full"></div>
                 
                 {/* Colored Line Overlay */}
                 <div 
-                  className={`absolute top-1/2 left-0 h-2 -translate-y-1/2 z-0 rounded-full transition-all duration-500 ${reportData.isRejected ? 'bg-red-500' : 'bg-yellow-400'}`}
+                  className={`absolute top-1/2 left-0 h-3 -translate-y-1/2 z-0 rounded-full transition-all duration-500 ${reportData.isRejected ? 'bg-red-500' : 'bg-yellow-400'}`}
                   style={{ width: reportData.isRejected ? '33%' : `${((reportData.status - 1) / 3) * 100}%` }}
                 ></div>
 
                 <div className="relative z-10 flex justify-between w-full">
                   {/* Step 1: Dikirimkan */}
                   <div className="flex flex-col items-center gap-2 w-24">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 bg-white z-10
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl border-[6px] bg-white z-10
                       ${reportData.status >= 1 ? (reportData.isRejected ? 'border-yellow-400 text-gray-900' : 'border-yellow-400 text-gray-900') : 'border-gray-200 text-gray-400'}`}>
                       1
                     </div>
@@ -127,7 +127,7 @@ const TrackingPage = () => {
 
                   {/* Step 2: Ditinjau / Ditolak */}
                   <div className="flex flex-col items-center gap-2 w-24">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 bg-white z-10
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl border-[6px] bg-white z-10
                       ${reportData.isRejected 
                         ? 'border-red-500 text-gray-900' 
                         : (reportData.status >= 2 ? 'border-yellow-400 text-gray-900' : 'border-gray-200 text-gray-400')}`}>
@@ -140,7 +140,7 @@ const TrackingPage = () => {
 
                   {/* Step 3: Tim Lapangan */}
                   <div className="flex flex-col items-center gap-2 w-24">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 bg-white z-10
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl border-[6px] bg-white z-10
                       ${reportData.status >= 3 && !reportData.isRejected ? 'border-yellow-400 text-gray-900' : 'border-gray-200 text-gray-400'}`}>
                       3
                     </div>
@@ -149,7 +149,7 @@ const TrackingPage = () => {
 
                   {/* Step 4: Selesai */}
                   <div className="flex flex-col items-center gap-2 w-24">
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl border-4 bg-white z-10
+                    <div className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl border-[6px] bg-white z-10
                       ${reportData.status >= 4 && !reportData.isRejected ? 'border-yellow-400 text-gray-900' : 'border-gray-200 text-gray-400'}`}>
                       4
                     </div>

@@ -48,8 +48,8 @@ const TrackingPage = () => {
             <span className="text-xl font-bold text-gray-900">LaporCerdas</span>
           </div>
           <div className="flex gap-8 text-sm font-medium text-gray-700">
-            <a href="#" className="hover:text-green-600">Halaman Utama</a>
-            <a href="#" className="hover:text-green-600">Laporan</a>
+            <a href="/tracking" className="text-green-600 font-bold">Halaman Utama</a>
+            <a href="/laporan" className="hover:text-green-600">Laporan</a>
             <a href="#" className="hover:text-green-600">Kontak</a>
           </div>
         </div>

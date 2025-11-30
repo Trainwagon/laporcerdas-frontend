@@ -1,261 +1,337 @@
-import React, { useState } from 'react';
-import { Facebook, Instagram, Youtube, Mail, Upload, AlertCircle } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import Navbar from "../components/layout/navbar";
+import Footer from "../components/layout/footer";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
+import {
+  FileText,
+  MapPin,
+  Upload,
+  User,
+  Mail,
+  Home,
+  Phone,
+  CreditCard,
+  AlertCircle,
+  CheckCircle2,
+  Shield,
+} from "lucide-react";
 
-const ReportPage = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    description: '',
-    location: '',
-    name: '',
-    nik: '',
-    email: '',
-    address: '',
-    phone: '',
-    agreement: false
+const schema = z.object({
+  description: z.string().min(20, "Deskripsi minimal 20 karakter"),
+  location: z.string().nonempty("Lokasi wajib diisi"),
+  nik: z.string().length(16, "NIK harus 16 digit"),
+  name: z.string().optional(),
+  email: z.string().email("Email tidak valid").optional().or(z.literal("")),
+  address: z.string().optional(),
+  phone: z.string().optional(),
+  photo: z
+    .any()
+    .refine(
+      (files) => !files || files.length === 0 || files[0]?.size <= 5000000,
+      {
+        message: "Ukuran file maksimal 5MB",
+      }
+    )
+    .refine(
+      (files) =>
+        !files ||
+        files.length === 0 ||
+        ["image/jpeg", "image/jpg"].includes(files[0]?.type),
+      {
+        message: "Hanya file JPG/JPEG yang diperbolehkan",
+      }
+    )
+    .optional(),
+  agreement: z.literal(true, {
+    errorMap: () => ({ message: "Anda harus menyetujui pernyataan." }),
+  }),
+  captchaToken: z.string().nonempty("Captcha belum diverifikasi."),
+});
+
+export default function ReportPage() {
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Handle submission logic here
+  const onSubmit = (data) => {
+    if (!captchaToken) {
+      alert("Silakan verifikasi Captcha terlebih dahulu.");
+      return;
+    }
+    setIsSubmitting(true);
+    setTimeout(() => {
+      console.log(data);
+      alert("Laporan berhasil dikirim!");
+      reset();
+      setCaptchaToken(null);
+      setIsSubmitting(false);
+    }, 2000);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-white py-4 px-8 shadow-sm">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <img src="/Logo-LaporCerdas.svg" alt="Logo" className="h-8 w-auto" />
-            <span className="text-xl font-bold text-gray-900">LaporCerdas</span>
-          </div>
-          <div className="flex gap-8 text-sm font-medium text-gray-700">
-            <a href="/tracking" className="hover:text-green-600">Halaman Utama</a>
-            <a href="/laporan" className="text-green-600 font-bold">Laporan</a>
-            <a href="#" className="hover:text-green-600">Kontak</a>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-linear-to-brrom-amber-50 via-orange-50 to-yellow-50">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div
+          className="absolute top-40 right-10 w-96 h-96 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+          style={{ animationDelay: "2s" }}></div>
+        <div
+          className="absolute bottom-20 left-1/2 w-80 h-80 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+          style={{ animationDelay: "4s" }}></div>
+      </div>
 
-      <main className="flex-grow py-12 px-4">
+      <Navbar />
+
+      <main className="relative py-12 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Buat Laporan</h1>
-            <p className="text-gray-600">Laporkan masalah untuk meningkatkan layanan kelurahan Roa Malaka</p>
-          </div>
+          {/* Form Card */}
+          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-8 md:p-10 border border-white/20">
+            <div className="flex flex-col items-center text-center">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex items-center justify-center w-20 h-20 bg-linear-to-br from-yellow-400 to-orange-500 rounded-2xl shadow-lg">
+                  <FileText className="w-10 h-10 text-white" />
+                </div>
+                <h1 className="text-4xl font-extrabold bg-linear-to-r from-yellow-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">
+                  Buat Laporan
+                </h1>
+              </div>
+              <p className="text-gray-600 text-sm max-w-xl mx-auto mb-5">
+                Sampaikan laporan Anda dengan jelas dan lengkap. Kami akan
+                meninjau setiap laporan secara serius dan profesional.
+              </p>
+            </div>
 
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm">
-            <form onSubmit={handleSubmit}>
-              {/* Section 1: Detail Laporan */}
-              <div className="mb-12">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-xl font-bold text-gray-900">
-                    1
+            <div className="space-y-8">
+              {/* Deskripsi Laporan */}
+              <div className="group">
+                <label className="flex items-center gap-2 font-semibold text-gray-700 text-sm mb-3">
+                  <FileText className="w-4 h-4 text-yellow-600" />
+                  Deskripsi Laporan *
+                </label>
+                <div className="relative">
+                  <Textarea
+                    {...register("description")}
+                    placeholder="Tuliskan detail kejadian atau masalah dengan lengkap..."
+                    className={`mt-1 bg-linear-to-br from-gray-50 to-gray-100/50 border-2 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 rounded-xl ${
+                      errors.description ? "border-red-300" : "border-gray-200"
+                    }`}
+                    rows={6}
+                  />
+                </div>
+                {errors.description && (
+                  <div className="flex items-center gap-2 mt-2 text-red-500 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.description.message}
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Detail Laporan</h2>
+                )}
+              </div>
+
+              {/* Lokasi */}
+              <div className="group">
+                <label className="flex items-center gap-2 font-semibold text-gray-700 text-sm mb-3">
+                  <MapPin className="w-4 h-4 text-yellow-600" />
+                  Lokasi Kejadian *
+                </label>
+                <Input
+                  {...register("location")}
+                  placeholder="Contoh: Jalan Merdeka No. 10, Jakarta Pusat"
+                  className={`bg-linear-to-br from-gray-50 to-gray-100/50 border-2 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 rounded-xl h-12 ${
+                    errors.location ? "border-red-300" : "border-gray-200"
+                  }`}
+                />
+                {errors.location && (
+                  <div className="flex items-center gap-2 mt-2 text-red-500 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.location.message}
+                  </div>
+                )}
+              </div>
+
+              {/* Upload Foto */}
+              <div className="group">
+                <label className="flex items-center gap-2 font-semibold text-gray-700 text-sm mb-3">
+                  <Upload className="w-4 h-4 text-yellow-600" />
+                  Upload Foto (Opsional)
+                </label>
+                <div className="relative">
+                  <Input
+                    type="file"
+                    accept=".jpg,.jpeg"
+                    className="bg-linear-to-br from-gray-50 to-gray-100/50 border-2 border-gray-200 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 rounded-xl h-12 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100 cursor-pointer"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Format: JPG/JPEG saja, maksimal 5MB
+                </p>
+              </div>
+
+              <div className="relative py-4">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t-2 border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white px-6 py-2 text-sm font-bold text-gray-500 rounded-full shadow-sm border-2 border-gray-200">
+                    Informasi Pelapor
+                  </span>
+                </div>
+              </div>
+
+              {/* Informasi Pelapor */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="group">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                    <User className="w-4 h-4 text-yellow-600" />
+                    Nama Lengkap
+                  </label>
+                  <Input
+                    {...register("name")}
+                    placeholder="Nama lengkap Anda"
+                    className="bg-linear-to-br from-gray-50 to-gray-100/50 border-2 border-gray-200 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 rounded-xl h-12"
+                  />
                 </div>
 
-                <div className="space-y-6 pl-0 md:pl-14">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">
-                      Deskripsi laporan <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 h-32 resize-none"
-                      placeholder="Jelaskan secara detail masalah yang ingin anda laporkan..."
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    ></textarea>
-                    <p className="text-xs text-gray-400 mt-1">Minimal 20 karakter</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">
-                      Lokasi Kejadian <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="Contoh: Jalan Roa Malaka No. 123"
-                      value={formData.location}
-                      onChange={(e) => setFormData({...formData, location: e.target.value})}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">
-                      Upload Foto Bukti <span className="text-gray-400 font-normal">(Opsional)</span>
-                    </label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:bg-gray-50 transition-colors">
-                      <div className="flex flex-col items-center justify-center text-gray-500">
-                        <p className="text-xs font-bold mb-1">Klik untuk upload foto</p>
-                        <p className="text-[10px]">Maksimal 5MB, format JPG/PNG</p>
-                      </div>
+                <div className="group">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                    <CreditCard className="w-4 h-4 text-yellow-600" />
+                    NIK *
+                  </label>
+                  <Input
+                    {...register("nik")}
+                    maxLength={16}
+                    placeholder="16 digit NIK"
+                    className={`bg-linear-to-br from-gray-50 to-gray-100/50 border-2 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 rounded-xl h-12 ${
+                      errors.nik ? "border-red-300" : "border-gray-200"
+                    }`}
+                  />
+                  {errors.nik && (
+                    <div className="flex items-center gap-2 mt-2 text-red-500 text-sm">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.nik.message}
                     </div>
-                  </div>
+                  )}
+                </div>
+
+                <div className="group">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                    <Mail className="w-4 h-4 text-yellow-600" />
+                    Email (Opsional)
+                  </label>
+                  <Input
+                    {...register("email")}
+                    placeholder="email@example.com"
+                    className={`bg-linear-to-br from-gray-50 to-gray-100/50 border-2 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 rounded-xl h-12 ${
+                      errors.email ? "border-red-300" : "border-gray-200"
+                    }`}
+                  />
+                  {errors.email && (
+                    <div className="flex items-center gap-2 mt-2 text-red-500 text-sm">
+                      <AlertCircle className="w-4 h-4" />
+                      {errors.email.message}
+                    </div>
+                  )}
+                </div>
+
+                <div className="group">
+                  <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                    <Phone className="w-4 h-4 text-yellow-600" />
+                    No. Telepon (Opsional)
+                  </label>
+                  <Input
+                    {...register("phone")}
+                    placeholder="08xxxxxxxxxx"
+                    className="bg-linear-to-br from-gray-50 to-gray-100/50 border-2 border-gray-200 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 rounded-xl h-12"
+                  />
                 </div>
               </div>
 
-              {/* Section 2: Informasi Pelapor */}
-              <div className="mb-12">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-xl font-bold text-gray-900">
-                    2
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900">Informasi Pelapor</h2>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-0 md:pl-14">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Nama Lengkap</label>
-                    <input
-                      type="text"
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="Nama Anda"
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">NIK</label>
-                    <input
-                      type="text"
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="Nomor Induk Kependudukan"
-                      value={formData.nik}
-                      onChange={(e) => setFormData({...formData, nik: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Email <span className="text-gray-400 font-normal">(Opsional)</span></label>
-                    <input
-                      type="email"
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="email@example.com"
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Alamat <span className="text-gray-400 font-normal">(Opsional)</span></label>
-                    <input
-                      type="text"
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                      placeholder="Alamat lengkap"
-                      value={formData.address}
-                      onChange={(e) => setFormData({...formData, address: e.target.value})}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-bold text-gray-900 mb-2">Nomor Telepon <span className="text-gray-400 font-normal">(Opsional)</span></label>
-                    <input
-                      type="tel"
-                      className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400 md:w-1/2"
-                      placeholder="+62 812 3456 7890"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    />
-                  </div>
-                </div>
+              <div className="group">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-3">
+                  <Home className="w-4 h-4 text-yellow-600" />
+                  Alamat (Opsional)
+                </label>
+                <Input
+                  {...register("address")}
+                  placeholder="Alamat lengkap Anda"
+                  className="bg-linear-to-br from-gray-50 to-gray-100/50 border-2 border-gray-200 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100 rounded-xl h-12"
+                />
               </div>
 
-              {/* Agreement & Captcha */}
-              <div className="pl-0 md:pl-14 space-y-6 mb-8">
-                <div className="border border-gray-300 rounded-lg p-4 flex items-start gap-3">
-                  <div className="mt-0.5">
-                    <AlertCircle size={16} className="text-yellow-500" />
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="agreement"
-                      className="w-4 h-4 text-yellow-400 border-gray-300 rounded focus:ring-yellow-400"
-                      checked={formData.agreement}
-                      onChange={(e) => setFormData({...formData, agreement: e.target.checked})}
-                    />
-                    <label htmlFor="agreement" className="text-xs text-gray-700">
-                      Saya menyetujui bahwa data saya digunakan sesuai kebijakan privasi dan peraturan pemerintahan kelurahan
-                    </label>
+              <div className="bg-linear-to-br from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-2xl p-5 shadow-sm">
+                <div className="flex items-start gap-4">
+                  <input
+                    type="checkbox"
+                    {...register("agreement")}
+                    className="w-5 h-5 mt-1 accent-yellow-500 rounded cursor-pointer"
+                  />
+                  <div>
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      <span className="font-semibold">Pernyataan:</span> Saya
+                      menyatakan bahwa semua informasi yang saya isi adalah
+                      benar dan dapat dipertanggungjawabkan sesuai dengan
+                      peraturan yang berlaku.
+                    </p>
                   </div>
                 </div>
-
-                {/* Captcha Placeholder */}
-                <div className="border border-gray-300 rounded-lg p-3 w-fit bg-white flex items-center gap-4">
-                   <div className="w-6 h-6 border border-gray-300 rounded bg-white"></div>
-                   <span className="text-sm text-gray-700">Captcha</span>
-                </div>
+                {errors.agreement && (
+                  <div className="flex items-center gap-2 mt-3 text-red-500 text-sm ml-9">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.agreement.message}
+                  </div>
+                )}
               </div>
 
-              {/* Buttons */}
-              <div className="flex gap-4 justify-end">
-                <button
-                  type="button"
-                  onClick={() => navigate('/tracking')}
-                  className="px-8 py-3 border border-gray-400 text-gray-700 font-bold rounded-lg hover:bg-gray-50 transition-colors w-full md:w-auto"
-                >
-                  Batal
-                </button>
-                <button
-                  type="submit"
-                  className="px-8 py-3 bg-yellow-400 text-white font-bold rounded-lg hover:bg-yellow-500 transition-colors w-full md:w-auto"
-                >
-                  Kirim Laporan
-                </button>
+              <div className="mt-6 flex flex-col items-center justify-center">
+                <ReCAPTCHA
+                  sitekey="YOUR_RECAPTCHA_SITE_KEY"
+                  onChange={(token) => {
+                    setCaptchaToken(token);
+                    setValue("captchaToken", token);
+                  }}
+                />
+                {errors.captchaToken && (
+                  <p className="text-red-500 text-sm mt-2 text-center">
+                    {errors.captchaToken.message}
+                  </p>
+                )}
               </div>
-            </form>
+
+              <Button
+                type="button"
+                onClick={handleSubmit(onSubmit)}
+                disabled={isSubmitting}
+                className="w-full py-6 text-lg font-bold bg-linear-to-r from-yellow-400 via-orange-500 to-yellow-500 hover:from-yellow-500 hover:via-orange-600 hover:to-yellow-600 text-white rounded-xl shadow-lg hover:shadow-xl active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed">
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Mengirim Laporan...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Kirim Laporan
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white pt-12 pb-4 border-t border-gray-200 mt-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex justify-between items-start mb-12">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-               <img src="/Logo-LaporCerdas.svg" alt="Logo" className="h-12 w-auto" />
-            </div>
-
-            {/* Address */}
-            <div className="text-[10px] text-gray-600 max-w-[200px]">
-              <p className="font-bold mb-1">Alamat</p>
-              <p>Jl. Tiang Bendera V No. 26 Rt. 004/Rw. 03 Kelurahan Roa Malaka, Kecamatan Tambora, Jakarta Barat</p>
-              <p className="mt-2 font-bold">Informasi Kontak</p>
-              <div className="flex gap-2 mt-1">
-                <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center text-white text-[8px]"><Mail size={8}/></div>
-                <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center text-white text-[8px]"><Facebook size={8}/></div>
-                <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center text-white text-[8px]"><Youtube size={8}/></div>
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <div className="text-[10px] text-gray-600">
-              <p className="font-bold mb-1">Navigasi</p>
-              <ul className="space-y-1">
-                <li><a href="#">Tentang Kami</a></li>
-                <li><a href="#">Panduan Pengguna</a></li>
-                <li><a href="#">Kebijakan Privasi</a></li>
-                <li><a href="#">Syarat & Ketentuan</a></li>
-              </ul>
-            </div>
-
-            {/* Logos */}
-            <div className="flex gap-2">
-              <img src="/PROV-DKI-JAKARTA-PNG.svg" alt="DKI" className="h-8 w-auto" />
-              <img src="/LOGO-APTIKOM-NO-BG.svg" alt="Aptikom" className="h-8 w-auto" />
-              <img src="/logo-universitas-gunadarma-warna.svg" alt="Gunadarma" className="h-8 w-auto" />
-              <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
-            </div>
-          </div>
-          
-          <div className="text-center text-[10px] text-gray-500 border-t border-gray-100 pt-4">
-            Copyright 2025 LaporCerdas. All Rights Reserved
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
-};
-
-export default ReportPage;
+}

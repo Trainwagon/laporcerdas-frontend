@@ -1,449 +1,249 @@
-import React, { useState } from "react";
-import { Search, Facebook, Instagram, Youtube, Mail } from "lucide-react";
+import Navbar from "../components/layout/navbar";
+import Footer from "../components/layout/footer";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-const TrackingPage = () => {
-  const [searchId, setSearchId] = useState("");
-  const [reportData, setReportData] = useState(null);
+import { Search, MapPin, FileText, Clock, Send } from "lucide-react";
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchId.trim()) {
-      // Simulate fetching data based on ID for demonstration
-      // ID "1" -> Status 1 (Dikirimkan)
-      // ID "2" -> Status 2 (Ditinjau)
-      // ID "3" -> Status 3 (Tim Lapangan)
-      // ID "4" -> Status 4 (Selesai)
-      // ID "5" -> Status Rejected (Ditolak)
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
-      let mockStatus = 1;
-      let isRejected = false;
+const schema = z.object({
+  trackingId: z.string().min(3, "ID laporan tidak valid"),
+});
 
-      if (searchId === "2") mockStatus = 2;
-      else if (searchId === "3") mockStatus = 3;
-      else if (searchId === "4") mockStatus = 4;
-      else if (searchId === "5") {
-        mockStatus = 2;
-        isRejected = true;
-      } // Rejected usually happens at review stage
+const dummyReport = {
+  id: "IDLapor#928371",
+  status: 3,
+  timeline: [
+    { title: "Laporan Dikirim", date: "11 Nov 2025" },
+    { title: "Ditinjau Admin", date: "12 Nov 2025" },
+    { title: "Tim Lapangan Ditugaskan", date: "13 Nov 2025" },
+  ],
+  description:
+    "Terdapat lubang besar di jalan utama yang membahayakan pengendara motor.",
+  location: "Jl. Tiang Bendera V, Jakarta Barat",
+};
 
-      setReportData({
-        id: `IDLapor#${Math.floor(Math.random() * 1000000)}`,
-        status: mockStatus,
-        isRejected: isRejected,
-        date: "11 November 2025",
-        deadline: "14 November 2025",
-        category: "Infrastruktur",
-        description:
-          "Adanya lobang besar di dekat jalan raya yang membahayakan pengendara motor.",
-        rejectionReason:
-          "Laporan tidak valid karena lokasi tidak berada di wilayah Roa Malaka.",
-        location: "Jl. Tiang Bendera V",
-        coordinates: "-6.123456, 106.123456",
-      });
-    }
+export default function TrackingPage() {
+  const [data, setData] = useState(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = () => {
+    // nanti tinggal ganti ke API
+    setData(dummyReport);
   };
 
+  const steps = [
+    {
+      step: 1,
+      title: "Pengiriman Laporan",
+      desc: "Laporan berhasil dikirim ke sistem.",
+    },
+    {
+      step: 2,
+      title: "Verifikasi",
+      desc: "Petugas meninjau laporan warga.",
+    },
+    {
+      step: 3,
+      title: "Tindak Lanjut",
+      desc: "Tim lapangan melakukan penanganan.",
+    },
+    {
+      step: 4,
+      title: "Selesai",
+      desc: "Laporan telah ditangani.",
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 font-sans flex flex-col">
-      {/* Navbar */}
-      <nav className="bg-white py-4 px-8 shadow-sm">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <div className="flex items-center gap-2">
+    <div className="min-h-screen bg-linear-to-brrom-amber-50 via-orange-50 to-yellow-50">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div
+          className="absolute top-40 right-10 w-96 h-96 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+          style={{ animationDelay: "2s" }}></div>
+        <div
+          className="absolute bottom-20 left-1/2 w-80 h-80 bg-amber-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+          style={{ animationDelay: "4s" }}></div>
+      </div>
+
+      <Navbar />
+
+      <main className="relative py-12 px-4">
+        <div className="max-w-5xl mx-auto space-y-14">
+          {/* Hero */}
+          <section className="bg-white/90 backdrop-blur-sm shadow-xl rounded-3xl p-8 md:p-10 grid md:grid-cols-2 gap-8 items-center">
             <img
-              src="/Logo-LaporCerdas.svg"
-              alt="Logo"
-              className="h-8 w-auto"
+              src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5"
+              className="h-64 w-full object-cover rounded-2xl"
             />
-            <span className="text-xl font-bold text-gray-900">LaporCerdas</span>
-          </div>
-          <div className="flex gap-8 text-sm font-medium text-gray-700">
-            <a href="/tracking" className="text-green-600 font-bold">
-              Halaman Utama
-            </a>
-            <a href="/laporan" className="hover:text-green-600">
-              Laporan
-            </a>
-            <a href="#" className="hover:text-green-600">
-              Kontak
-            </a>
-          </div>
-        </div>
-      </nav>
-
-      <main className="grow">
-        <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
-          {/* Hero Section */}
-          <div className="bg-[#EAE4D3] rounded-3xl p-8 flex gap-8 items-center">
-            <div className="w-1/3 shrink-0">
-              {/* Placeholder for the construction worker image */}
-              <div className="w-full h-64 bg-gray-300 rounded-xl overflow-hidden relative">
-                <img
-                  src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop"
-                  alt="Construction Worker"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-            <div className="flex-1">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Apa itu LaporCerdas
+            <div>
+              <h2 className="text-3xl font-extrabold mb-4">
+                Apa itu LaporCerdas?
               </h2>
-              <p className="text-sm text-gray-700 leading-relaxed mb-6 text-justify">
-                LaporCerdas merupakan platform yang dibuat khusus untuk warga di
-                wilayah pemerintahan Roa Malaka yang berfungsi sebagai media
-                pelaporan warga, mulai dari pelaporan kerusakan infrastruktur,
-                masalah kebersihan, hingga berbagai keluhan pelayanan masyarakat
-                lainnya. Platform ini dirancang untuk mempermudah proses
-                penyampaian aspirasi warga melalui formulir pelaporan yang dapat
-                diakses secara online tanpa perlu datang langsung ke kantor
-                kelurahan. Setiap laporan yang dikirim akan diproses oleh
-                sistem, diberikan ID laporan unik, dan secara otomatis
-                dikategorikan menggunakan teknologi AI/NLP ke dalam salah satu
-                dari tiga seksi terkait: Pemerintahan, Kesejahteraan, atau
-                Ekonomi Pembangunan. Dengan adanya fitur pelacakan status, warga
-                dapat memonitor progres laporan secara mandiri, sementara pihak
-                kelurahan dapat mengelola laporan dengan lebih cepat,
-                terstruktur, dan transparan melalui dashboard internal.
+              <p className="text-gray-700 leading-relaxed mb-6 text-justify">
+                LaporCerdas adalah platform digital pelaporan masyarakat yang
+                memudahkan warga menyampaikan keluhan dan memantau prosesnya
+                secara transparan.
               </p>
-              <button className="px-6 py-2 bg-slate-500 text-white text-sm font-medium rounded hover:bg-slate-600 transition-colors">
-                Laporkan!
-              </button>
+              <Link
+                to="/report"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white text-sm font-bold rounded-lg shadow-md">
+                <Send className="w-4 h-4" />
+                Buat Laporan
+              </Link>
             </div>
-          </div>
+          </section>
 
-          {/* Search Section */}
-          <div className="bg-white rounded-3xl p-8 shadow-sm text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Cari Laporan
-            </h2>
+          {/* Pencarian */}
+          <section className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl p-8 md:p-10">
+            <h3 className="text-xl font-bold text-center mb-6">
+              Lacak Status Laporan
+            </h3>
+
             <form
-              onSubmit={handleSearch}
-              className="max-w-3xl mx-auto relative">
-              <input
-                type="text"
-                placeholder="Masukan id laporan"
-                value={searchId}
-                onChange={(e) => setSearchId(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              onSubmit={handleSubmit(onSubmit)}
+              className="max-w-xl mx-auto flex gap-3">
+              <Input
+                {...register("trackingId")}
+                placeholder="Masukkan ID Laporan"
+                className="h-12 flex-1 rounded-xl border-2 border-gray-200 bg-linear-to-br from-gray-50 to-gray-100/60 transition-all duration-300 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-200 hover:border-yellow-300 hover:bg-yellow-50/40"
               />
-              <Search
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-            </form>
-          </div>
 
-          {/* Progress Section - Only shows when reportData is present */}
-          {reportData && (
-            <div className="bg-white rounded-3xl p-8 shadow-sm">
-              <div className="text-center mb-12">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  Kemajuan Laporan
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Id Laporan : {reportData.id}
-                </p>
-              </div>
+              <Button
+                type="submit"
+                className=" h-12 px-6 rounded-xl font-bold whitespace-nowrap bg-linear-to-r from-yellow-400 to-orange-500 text-white shadow-md transition-all duration-300 hover:from-yellow-500 hover:to-orange-600 hover:shadow-lg active:scale-[0.97] focus:ring-4 focus:ring-yellow-300">
+                <Search className="w-4 h-4 mr-2" />
+                Lacak
+              </Button>
+            </form>
+
+            {errors.trackingId && (
+              <p className="text-red-500 text-sm text-center mt-3">
+                {errors.trackingId.message}
+              </p>
+            )}
+          </section>
+
+          {/* Hasil */}
+          {data && (
+            <section className="bg-white/90 rounded-3xl shadow-xl p-8 md:p-10">
+              <h3 className="text-lg font-bold text-center mb-10">
+                Tahapan Proses Laporan
+              </h3>
 
               {/* Stepper */}
-              <div className="max-w-3xl mx-auto mb-16 relative">
-                {/* Connecting Line */}
-                <div className="absolute top-7 left-0 w-full h-3 bg-gray-200 -translate-y-1/2 z-0 rounded-full"></div>
+              <div className="relative max-w-5xl mx-auto">
+                <div className="absolute top-6 left-0 w-full h-1 bg-gray-200 rounded-full" />
 
-                {/* Colored Line Overlay */}
-                <div
-                  className={`absolute top-7 left-0 h-3 -translate-y-1/2 z-0 rounded-full transition-all duration-500 ${
-                    reportData.isRejected ? "bg-red-500" : "bg-yellow-400"
-                  }`}
-                  style={{
-                    width: reportData.isRejected
-                      ? "33%"
-                      : `${((reportData.status - 1) / 3) * 100}%`,
-                  }}></div>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{
+                    width: `${((data.status - 1) / (steps.length - 1)) * 100}%`,
+                  }}
+                  transition={{ duration: 0.6 }}
+                  className="absolute top-6 left-0 h-1 bg-yellow-400 rounded-full"
+                />
 
-                <div className="relative z-10 flex justify-between w-full">
-                  {/* Step 1: Dikirimkan */}
-                  <div className="flex flex-col items-center gap-2 w-24">
-                    <div
-                      className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl border-[6px] bg-white z-10
-                      ${
-                        reportData.status >= 1
-                          ? reportData.isRejected
-                            ? "border-yellow-400 text-gray-900"
-                            : "border-yellow-400 text-gray-900"
-                          : "border-gray-200 text-gray-400"
-                      }`}>
-                      1
-                    </div>
-                    <p className="text-sm font-bold text-center leading-tight">
-                      Laporan Dikirimkan
-                    </p>
-                  </div>
+                <div className="relative grid grid-cols-4 gap-4 text-center">
+                  {steps.map((item, index) => {
+                    const isActive = data.status >= item.step;
 
-                  {/* Step 2: Ditinjau / Ditolak */}
-                  <div className="flex flex-col items-center gap-2 w-24">
-                    <div
-                      className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl border-[6px] bg-white z-10
-                      ${
-                        reportData.isRejected
-                          ? "border-red-500 text-gray-900"
-                          : reportData.status >= 2
-                          ? "border-yellow-400 text-gray-900"
-                          : "border-gray-200 text-gray-400"
-                      }`}>
-                      2
-                    </div>
-                    <p className="text-sm font-bold text-center leading-tight">
-                      {reportData.isRejected
-                        ? "Ditolak"
-                        : "Laporan Sedang Ditinjau"}
-                    </p>
-                  </div>
+                    return (
+                      <motion.div
+                        key={item.step}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.15 }}
+                        className="flex flex-col items-center">
+                        <div
+                          className={`
+                  w-12 h-12 rounded-full flex items-center justify-center
+                  font-bold text-lg z-10
+                  ${
+                    isActive
+                      ? "bg-yellow-400 text-white"
+                      : "bg-gray-200 text-gray-400"
+                  }
+                `}>
+                          {item.step}
+                        </div>
 
-                  {/* Step 3: Tim Lapangan */}
-                  <div className="flex flex-col items-center gap-2 w-24">
-                    <div
-                      className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl border-[6px] bg-white z-10
-                      ${
-                        reportData.status >= 3 && !reportData.isRejected
-                          ? "border-yellow-400 text-gray-900"
-                          : "border-gray-200 text-gray-400"
-                      }`}>
-                      3
-                    </div>
-                    <p className="text-sm font-bold text-center leading-tight text-gray-500">
-                      Tim Lapangan Ditugaskan
-                    </p>
-                  </div>
-
-                  {/* Step 4: Selesai */}
-                  <div className="flex flex-col items-center gap-2 w-24">
-                    <div
-                      className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-2xl border-[6px] bg-white z-10
-                      ${
-                        reportData.status >= 4 && !reportData.isRejected
-                          ? "border-yellow-400 text-gray-900"
-                          : "border-gray-200 text-gray-400"
-                      }`}>
-                      4
-                    </div>
-                    <p className="text-sm font-bold text-center leading-tight text-gray-500">
-                      Selesai
-                    </p>
-                  </div>
+                        {/* Text */}
+                        <h4 className="mt-4 font-bold text-sm text-gray-900">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-gray-600 max-w-40">
+                          {item.desc}
+                        </p>
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </div>
 
-              <hr className="border-gray-200 mb-8" />
+              {/* Detail Ringkas */}
+              <div className="mt-12 grid md:grid-cols-3 gap-6">
+                {/* Deskripsi */}
+                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
+                  <div className="flex items-center gap-2 mb-4">
+                    <FileText className="w-5 h-5 text-yellow-600" />
+                    <h4 className="font-bold text-sm text-gray-900">
+                      Deskripsi Laporan
+                    </h4>
+                  </div>
+                  <div className="bg-gray-100 rounded-lg p-4 text-sm text-gray-700 leading-relaxed">
+                    {data.description}
+                  </div>
+                </div>
 
-              {/* Details Grid */}
-              <div className="grid grid-cols-2 gap-12 text-left">
-                {reportData.isRejected ? (
-                  // Rejected Layout
-                  <>
-                    <div>
-                      <div className="flex items-center gap-2 mb-6">
-                        <div className="w-3 h-3 rounded-full bg-black"></div>
-                        <h3 className="text-lg font-bold text-gray-900">
-                          Isi laporan
-                        </h3>
-                      </div>
-                      <div className="bg-slate-200 rounded-lg px-4 py-3 w-full">
-                        <p className="text-sm text-gray-700 font-medium leading-relaxed">
-                          {reportData.description}
-                        </p>
-                      </div>
-                    </div>
+                {/* Lokasi */}
+                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
+                  <div className="flex items-center gap-2 mb-4">
+                    <MapPin className="w-5 h-5 text-yellow-600" />
+                    <h4 className="font-bold text-sm text-gray-900">
+                      Lokasi Kejadian
+                    </h4>
+                  </div>
+                  <div className="bg-gray-100 rounded-lg p-4 text-sm text-gray-700">
+                    {data.location}
+                  </div>
+                </div>
 
-                    <div>
-                      <div className="flex items-center gap-2 mb-6">
-                        <div className="w-3 h-3 rounded-full bg-black"></div>
-                        <h3 className="text-lg font-bold text-gray-900">
-                          Alasan penolakan
-                        </h3>
-                      </div>
-                      <div className="bg-red-50 rounded-lg px-4 py-3 w-full border border-red-100">
-                        <p className="text-sm text-red-600 font-medium leading-relaxed">
-                          {reportData.rejectionReason}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  // Normal Layout
-                  <>
-                    <div>
-                      <div className="flex items-center gap-2 mb-6">
-                        <div className="w-3 h-3 rounded-full bg-black"></div>
-                        <h3 className="text-lg font-bold text-gray-900">
-                          Informasi laporan
-                        </h3>
-                      </div>
+                {/* Status */}
+                <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Clock className="w-5 h-5 text-yellow-600" />
+                    <h4 className="font-bold text-sm text-gray-900">
+                      Status Saat Ini
+                    </h4>
+                  </div>
 
-                      <div className="space-y-6">
-                        <div>
-                          <p className="text-base font-bold text-gray-900 mb-2">
-                            tanggal laporan masuk
-                          </p>
-                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-fit">
-                            <p className="text-sm text-gray-700 font-medium">
-                              {reportData.date}
-                            </p>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-base font-bold text-gray-900 mb-2">
-                            batas waktu penyelesaian
-                          </p>
-                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-fit">
-                            <p className="text-sm text-gray-700 font-medium">
-                              {reportData.deadline}
-                            </p>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-base font-bold text-gray-900 mb-2">
-                            kategori
-                          </p>
-                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-fit">
-                            <p className="text-sm text-gray-700 font-medium">
-                              {reportData.category}
-                            </p>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-base font-bold text-gray-900 mb-2">
-                            isi laporan
-                          </p>
-                          <div className="bg-slate-200 rounded-lg px-4 py-3 w-full">
-                            <p className="text-sm text-gray-700 font-medium leading-relaxed">
-                              {reportData.description}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="flex items-center gap-2 mb-6">
-                        <div className="w-3 h-3 rounded-full bg-black"></div>
-                        <h3 className="text-lg font-bold text-gray-900">
-                          Lokasi kejadian
-                        </h3>
-                      </div>
-
-                      <div className="space-y-6">
-                        <div>
-                          <p className="text-base font-bold text-gray-900 mb-2">
-                            lokasi masalah
-                          </p>
-                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-full">
-                            <p className="text-sm text-gray-700 font-medium">
-                              {reportData.location}
-                            </p>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-base font-bold text-gray-900 mb-2">
-                            koordinat
-                          </p>
-                          <div className="bg-slate-200 rounded-lg px-4 py-2 w-full">
-                            <p className="text-sm text-gray-700 font-medium">
-                              {reportData.coordinates}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm font-semibold text-yellow-700 text-center">
+                    Tahap {data.status} – {steps[data.status - 1]?.title}
+                  </div>
+                </div>
               </div>
-            </div>
+            </section>
           )}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white pt-12 pb-4 border-t border-gray-200 mt-12">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex justify-between items-start mb-12">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              <img
-                src="/Logo-LaporCerdas.svg"
-                alt="Logo"
-                className="h-12 w-auto"
-              />
-            </div>
-
-            {/* Address */}
-            <div className="text-[10px] text-gray-600 max-w-[200px]">
-              <p className="font-bold mb-1">Alamat</p>
-              <p>
-                Jl. Tiang Bendera V No. 26 Rt. 004/Rw. 03 Kelurahan Roa Malaka,
-                Kecamatan Tambora, Jakarta Barat
-              </p>
-              <p className="mt-2 font-bold">Informasi Kontak</p>
-              <div className="flex gap-2 mt-1">
-                <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center text-white text-[8px]">
-                  <Mail size={8} />
-                </div>
-                <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center text-white text-[8px]">
-                  <Facebook size={8} />
-                </div>
-                <div className="w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center text-white text-[8px]">
-                  <Youtube size={8} />
-                </div>
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <div className="text-[10px] text-gray-600">
-              <p className="font-bold mb-1">Navigasi</p>
-              <ul className="space-y-1">
-                <li>
-                  <a href="#">Tentang Kami</a>
-                </li>
-                <li>
-                  <a href="#">Panduan Pengguna</a>
-                </li>
-                <li>
-                  <a href="#">Kebijakan Privasi</a>
-                </li>
-                <li>
-                  <a href="#">Syarat & Ketentuan</a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Logos */}
-            <div className="flex gap-2">
-              <img
-                src="/PROV-DKI-JAKARTA-PNG.svg"
-                alt="DKI"
-                className="h-8 w-auto"
-              />
-              <img
-                src="/LOGO-APTIKOM-NO-BG.svg"
-                alt="Aptikom"
-                className="h-8 w-auto"
-              />
-              <img
-                src="/logo-universitas-gunadarma-warna.svg"
-                alt="Gunadarma"
-                className="h-8 w-auto"
-              />
-              <img src="/logo.svg" alt="Logo" className="h-8 w-auto" />
-            </div>
-          </div>
-
-          <div className="text-center text-[10px] text-gray-500 border-t border-gray-100 pt-4">
-            Copyright 2025 LaporCerdas. All Rights Reserved
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
-};
-
-export default TrackingPage;
+}

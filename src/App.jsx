@@ -10,10 +10,10 @@ import ReportPage from "./pages/ReportPage";
 function App() {
   return (
     <Routes>
-      <Route path="/tracking" element={<TrackingPage />} />
+      <Route path="/" element={<TrackingPage />} />
       <Route path="/laporan" element={<ReportPage />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Dashboard />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/crosscheck" element={<CrosscheckLaporan />} />
       <Route path="/rekapitulasi" element={<RekapitulasiLaporan />} />
     </Routes>

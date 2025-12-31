@@ -22,8 +22,8 @@ createRoot(document.getElementById("root")).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <App />
+        <Toaster richColors position="top-center" />
       </BrowserRouter>
-      <Toaster position="top-right" />
     </QueryClientProvider>
   </React.StrictMode>
 );

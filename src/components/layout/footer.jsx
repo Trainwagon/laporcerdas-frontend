@@ -13,10 +13,10 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   const navigationLinks = [
-    { name: "Tentang Kami", href: "/about" },
-    { name: "Panduan Pengguna", href: "/guide" },
-    { name: "Kebijakan Privasi", href: "/privacy" },
-    { name: "Syarat & Ketentuan", href: "/terms" },
+    { name: "Tentang Kami", href: "/" },
+    { name: "Panduan Pengguna", href: "/" },
+    { name: "Kebijakan Privasi", href: "/" },
+    { name: "Syarat & Ketentuan", href: "/" },
   ];
 
   const partners = [
@@ -138,7 +138,7 @@ export default function Footer() {
             </ul>
 
             <Link
-              to="/report"
+              to="/laporan"
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white text-sm font-bold rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 active:scale-95 transition-all duration-300">
               <Send className="w-4 h-4" />
               Buat Laporan
@@ -175,15 +175,11 @@ export default function Footer() {
             All Rights Reserved
           </p>
           <div className="flex items-center gap-4">
-            <Link
-              to="/privacy"
-              className="hover:text-yellow-600 transition-colors">
+            <Link to="/" className="hover:text-yellow-600 transition-colors">
               Privacy Policy
             </Link>
             <span className="text-gray-300">•</span>
-            <Link
-              to="/terms"
-              className="hover:text-yellow-600 transition-colors">
+            <Link to="/" className="hover:text-yellow-600 transition-colors">
               Terms of Service
             </Link>
             <span className="text-gray-300">•</span>

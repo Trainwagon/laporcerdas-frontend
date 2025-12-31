@@ -16,7 +16,7 @@ export default function Navbar() {
 
   const links = [
     { name: "Halaman Utama", href: "/", icon: Home },
-    { name: "Laporan", href: "/report", icon: FileText },
+    { name: "Laporan", href: "/laporan", icon: FileText },
     { name: "Kontak", href: "/contact", icon: Phone },
   ];
 
@@ -67,13 +67,7 @@ export default function Navbar() {
 
             <SheetContent
               side="right"
-              className="
-    w-[260px] sm:w-[300px]
-    p-6 flex flex-col
-    bg-linear-to-br from-yellow-50 to-orange-100
-    overflow-y-auto
-    scrollbar-thin scrollbar-thumb-yellow-300 scrollbar-track-transparent
-  ">
+              className="w-[260px] sm:w-[300px] p-6 flex flex-col bg-linear-to-br from-yellow-50 to-orange-100 overflow-y-auto scrollbar-thin scrollbar-thumb-yellow-300 scrollbar-track-transparent">
               <SheetHeader className="sr-only">
                 <SheetTitle>Menu Navigasi</SheetTitle>
                 <SheetDescription>
@@ -101,15 +95,12 @@ export default function Navbar() {
                     to={link.href}
                     onClick={() => setIsOpen(false)}
                     className={({ isActive }) =>
-                      `
-            flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold
-            transition-all duration-300
+                      `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300
             ${
               isActive
                 ? "bg-linear-to-r from-yellow-400 to-orange-500 text-white shadow-md scale-[1.02]"
                 : "text-gray-700 hover:bg-white/70 hover:text-yellow-700 hover:translate-x-1"
-            }
-          `
+            }`
                     }>
                     <link.icon className="w-5 h-5" />
                     {link.name}
